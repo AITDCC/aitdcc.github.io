@@ -688,7 +688,7 @@
           <a href="#ranking-table">Ranking table</a>
           <a href="#weissman-score">Weissman score</a>
           <a href="../data/data.zip" download>Download dataset</a>
-          <a href="../index.html">Home page</a>
+          <a href="https://pratas.github.io">Home page</a>
         </nav>
       </div>
 
@@ -696,16 +696,19 @@
         <h2>Competition Rules</h2>
         <div class="rules-box muted">
           <p align="justify">
-            The Algorithmic Information Theory (AIT) Data Compression Challenge is to build a lossless compression system with both a compressor and decompressor.
-            The implementation must stay within 8 GB peak RAM and the decompressor binary must be at most 1024 KB.
-            Submit your binaries according to <b>CompressorName inputFileName outputFileName</b> and
-            <b>DecompressorName inputFileName outputFileName</b> to pratas@ua.pt.
-            Results can now be viewed per dataset and for the overall aggregate across all files. Times are calculated with median.
-            Weissman score is calculated against gzip for the currently selected dataset.
-            To download the dataset, click <a href="../data/data.zip" class="special-link">here</a>
-            (number of bytes uncompressed overall: 13,136,308).
-            In the Ranking Table, click column headers to sort. Search and Ignore by text patterns
-            (these can be combined).
+            The Algorithmic Information Theory (AIT) Data Compression Challenge consists of building a lossless compression system with both a compressor 
+            and a decompressor. The implementation must stay within 8 GB of peak RAM, and the decompressor binary must not exceed 1024 KB. Participants 
+            were strongly encouraged to use arithmetic coding. Submissions had to follow the formats <b>CompressorName inputFileName outputFileName</b> and 
+            <b>DecompressorName inputFileName outputFileName</b>, and be sent to pratas@ua.pt.
+
+            The competition data was divided into two parts: a Training dataset and a Testing dataset. The Training dataset was visible to competitors 
+            throughout the competition, and intermediate results on that portion were regularly updated and made available. The Testing dataset, by 
+            contrast, was kept hidden until the end of the competition. Final evaluation on the Testing dataset was performed using the compressors 
+            optimized by participants on the Training data. The Testing portion represents approximately two thirds of the full dataset. 
+
+            Results can be viewed per dataset and also as an overall aggregate across all files. Times are calculated using the median. The Weissman 
+            score is computed against gzip for the currently selected dataset. To download the dataset, click <a href="data/data.zip" class="special-link">here</a>.
+            In the Ranking Table, click the column headers to sort. Search and Ignore can be used with text patterns, and these filters can be combined.
           </p>
         </div>
       </section>
