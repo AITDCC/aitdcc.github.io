@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en" class="dp-dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AITDCC 2026 — Official Dataset</title>
+  <meta name="description" content="Official AITDCC 2026 Training and Testing datasets with SHA-256 checksums.">
+  <meta name="color-scheme" content="light dark">
+  <script>
+  (() => {
+    const KEY = "dp-theme";
+    const saved = localStorage.getItem(KEY);
+    const theme = (saved === "light" || saved === "dark") ? saved : "dark";
+    document.documentElement.classList.toggle("dp-dark", theme === "dark");
+    document.documentElement.classList.toggle("dp-light", theme === "light");
+  })();
+  </script>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:rgba(255,255,255,.06);
+      --card-strong:rgba(255,255,255,.08);
+      --border:rgba(255,255,255,.12);
+      --text:#f3f4f6;
+      --muted:rgba(255,255,255,.70);
+      --accent:#7dd3fc;
+      --train:#78c88c;
+      --test:#ffc478;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% 0%, rgba(124,58,237,.25), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(59,130,246,.22), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+    }
+    a{color:var(--accent)}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 48px}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 12px 30px rgba(0,0,0,.35);
+      backdrop-filter:blur(10px);
+      padding:16px 18px 22px;
+    }
+    .banner{
+      position:relative;
+      overflow:hidden;
+      border-radius:16px;
+      min-height:220px;
+      padding:38px 36px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      background:
+        linear-gradient(90deg,#0B2A7A 0%,#3B3AA8 55%,#8B2EA6 100%);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 10px 26px rgba(0,0,0,.35);
+    }
+    .banner:before{
+      content:"";
+      position:absolute;inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size:40px 40px;
+      pointer-events:none;
+    }
+    .banner h1{position:relative;margin:0;font-size:clamp(34px,5vw,54px);line-height:1.05}
+    .banner p{position:relative;margin:14px 0 0;font-size:clamp(17px,2.2vw,25px);font-weight:650;color:#bff7ff}
+    .top-menu{
+      display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
+      margin:18px 0 0;padding:12px 14px;border-radius:14px;
+      border:1px solid var(--border);background:rgba(11,16,32,.84);
+    }
+    .top-menu a,.btn{
+      display:inline-block;padding:9px 13px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);
+      color:var(--text);font-weight:750;text-decoration:none;cursor:pointer;
+    }
+    .top-menu a:hover,.btn:hover,.download-btn:hover{background:rgba(255,255,255,.15)}
+    section{margin-top:22px}
+    h2{margin:0 0 10px;text-align:center;font-size:clamp(22px,2.4vw,30px)}
+    h3{margin:0 0 8px}
+    .subtitle{text-align:center;color:var(--muted);margin:0 auto 16px;max-width:850px;line-height:1.55}
+    .notice,.terms,.command-box{
+      padding:15px 17px;border-radius:15px;background:var(--card-strong);border:1px solid var(--border);
+      line-height:1.55;
+    }
+    .notice strong{color:#fff}
+    .summary-grid{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px;
+    }
+    .stat{padding:16px;border-radius:15px;border:1px solid var(--border);background:var(--card-strong);text-align:center}
+    .stat .value{display:block;font-size:clamp(24px,3vw,34px);font-weight:850}
+    .stat .label{display:block;margin-top:5px;color:var(--muted);font-size:13px}
+    .training{border-color:rgba(120,200,140,.55)}
+    .testing{border-color:rgba(255,196,120,.55)}
+    .table-wrap{overflow-x:auto;border-radius:16px}
+    table{
+      width:100%;border-collapse:separate;border-spacing:0;margin-top:14px;
+      border:1px solid var(--border);background:var(--card);border-radius:16px;overflow:hidden;
+    }
+    th,td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:middle}
+    th{text-align:left;background:rgba(11,16,32,.96);color:rgba(255,255,255,.82);font-size:13px}
+    tr:last-child td{border-bottom:none}
+    .right{text-align:right} .center{text-align:center} .num{white-space:nowrap}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    .hash{font-size:12px;word-break:break-all}
+    .dataset-badge{
+      display:inline-flex;min-width:34px;height:30px;align-items:center;justify-content:center;
+      border-radius:999px;font-weight:850;border:1px solid rgba(255,255,255,.25)
+    }
+    .dataset-badge.training{background:rgba(120,200,140,.22)}
+    .dataset-badge.testing{background:rgba(255,196,120,.20)}
+    .download-btn{
+      display:inline-block;white-space:nowrap;padding:7px 10px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);
+      color:var(--text);text-decoration:none;font-weight:750;font-size:13px;
+    }
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    pre{
+      margin:10px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px 13px;border-radius:12px;
+      background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.10);font-size:13px;line-height:1.5;
+    }
+    .terms ul{margin:8px 0 0;padding-left:22px}
+    .small{font-size:13px;color:var(--muted)}
+    footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
+    #dpThemeToggle{
+      position:fixed;top:12px;right:12px;z-index:9999;padding:8px 10px;border-radius:12px;
+      border:2px solid rgba(255,255,255,.25);background:rgba(15,18,23,.92);color:#e9edf1;
+      font:800 14px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;
+    }
+
+    html.dp-light{
+      --bg:#fff;--card:#fff;--card-strong:#fff;--border:rgba(0,0,0,.35);
+      --text:#000;--muted:rgba(0,0,0,.72);--accent:#0033cc;
+    }
+    html.dp-light body{background:#fff}
+    html.dp-light .card{border:2px solid #000;box-shadow:0 10px 24px rgba(0,0,0,.18);backdrop-filter:none}
+    html.dp-light .top-menu{background:#fff;border:2px solid #000}
+    html.dp-light .top-menu a,html.dp-light .btn,html.dp-light .download-btn{background:#fff;border:2px solid #000;color:#000}
+    html.dp-light th{background:#000;color:#fff}
+    html.dp-light table{border:2px solid #000}
+    html.dp-light pre{background:#f6f6f6;border-color:#bbb}
+    html.dp-light #dpThemeToggle{background:#fff;color:#000;border-color:#000}
+    html.dp-light .notice strong{color:#000}
+    @media(max-width:760px){
+      .summary-grid{grid-template-columns:1fr}
+      .wrap{padding:18px 12px 34px}
+      .card{padding:12px}
+      .banner{padding:32px 20px;min-height:190px}
+      th,td{padding:9px 8px}
+    }
+    @media print{#dpThemeToggle{display:none}}
+  </style>
+</head>
+<body>
+<button id="dpThemeToggle" type="button" aria-label="Toggle light/dark theme"></button>
+
+<div class="wrap">
+  <main class="card">
+    <header class="banner">
+      <h1>AITDCC 2026 Dataset</h1>
+      <p>Official Training &amp; Testing Data · Lossless Compression Benchmark</p>
+    </header>
+
+    <div style="display:flex;justify-content:center;margin-top:18px">
+      <a class="btn" href="https://aitdcc.github.io/" aria-label="Back to the AITDCC benchmark leaderboard">← Back to Benchmark</a>
+    </div>
+
+    <nav class="top-menu" aria-label="Dataset navigation">
+      <a href="https://aitdcc.github.io/">Benchmark results</a>
+      <a href="#training">Training A–H</a>
+      <a href="#testing">Testing I–P</a>
+      <a href="#integrity">SHA-256</a>
+      <a href="#usage">Usage &amp; attribution</a>
+      <a href="./data/SHA256SUMS" download>SHA256SUMS</a>
+      <a href="https://github.com/AITDCC/aitdcc.github.io/tree/main/data">GitHub data directory</a>
+    </nav>
+
+    <section>
+      <h2>Official dataset release</h2>
+      <p class="subtitle">
+        The complete AIT Data Compression Challenge 2026 dataset consists of 16 files, A–P.
+        Files A–H form the Training dataset and files I–P form the Testing dataset.
+        The Testing dataset was hidden during the competition and is now publicly released for reproducibility.
+      </p>
+
+      <div class="notice">
+        <strong>Canonical files:</strong> use the individual files linked on this page for byte-for-byte reproduction of the benchmark.
+        The previous <a href="./data/data.zip">data/data.zip</a> is the legacy Training archive containing A–H only and should not be interpreted as the complete A–P dataset.
+      </div>
+
+      <div class="summary-grid">
+        <div class="stat training">
+          <span class="value">8 files</span>
+          <span class="label">Training A–H · 13,136,308 bytes</span>
+        </div>
+        <div class="stat testing">
+          <span class="value">8 files</span>
+          <span class="label">Testing I–P · 25,153,011 bytes</span>
+        </div>
+        <div class="stat">
+          <span class="value">16 files</span>
+          <span class="label">Complete A–P · 38,289,319 bytes</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="training">
+      <h2>Training dataset — A–H</h2>
+      <p class="subtitle">Public during the competition. Total uncompressed size: <strong>13,136,308 bytes</strong>.</p>
+      <div class="table-wrap">
+        <table aria-label="Training dataset downloads">
+          <thead><tr><th>File</th><th class="right">Bytes</th><th>SHA-256</th><th class="center">Download</th></tr></thead>
+          <tbody>
+<tr>
+          <td class="file"><span class="dataset-badge training">A</span></td>
+          <td class="right num">1,308,765</td>
+          <td class="mono hash">4847f6507db6987d1c31e0a692ccf40d1c8953d0c15feee8139615a6a1f7f8e7</td>
+          <td class="center"><a class="download-btn" href="./data/A" download="A">Download A</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge training">B</span></td>
+          <td class="right num">1,168,767</td>
+          <td class="mono hash">e14f65d4ba595d0c7c84e21a43f07de7d1cac693220d7366517f2428f52051ab</td>
+          <td class="center"><a class="download-btn" href="./data/B" download="B">Download B</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge training">C</span></td>
+          <td class="right num">2,000,000</td>
+          <td class="mono hash">e53981006244ec5066a58e24939ffdafa7eab579b1fade14a9212662a8a5a354</td>
+          <td class="center"><a class="download-btn" href="./data/C" download="C">Download C</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge training">D</span></td>
+          <td class="right num">2,000,000</td>
+          <td class="mono hash">dbb62ea0572cac060ea94f70b4562d7f1177143ce74fdce9eb25005df0044d43</td>
+          <td class="center"><a class="download-btn" href="./data/D" download="D">Download D</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge training">E</span></td>
+          <td class="right num">1,012,112</td>
+          <td class="mono hash">ff07707d8705721e2ef9f0dc40fadf4af073cf17e072d26c7bab4188b1080e13</td>
+          <td class="center"><a class="download-btn" href="./data/E" download="E">Download E</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge training">F</span></td>
+          <td class="right num">2,097,152</td>
+          <td class="mono hash">a4be1fcb6fca75616924fc9989dfea9d512a2972ca0465b4eca138574d47160f</td>
+          <td class="center"><a class="download-btn" href="./data/F" download="F">Download F</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge training">G</span></td>
+          <td class="right num">2,526,752</td>
+          <td class="mono hash">87ab967bcc7cba7192352915ecd147e9a96114923ea69bbc7fa32d7e7599ce16</td>
+          <td class="center"><a class="download-btn" href="./data/G" download="G">Download G</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge training">H</span></td>
+          <td class="right num">1,022,760</td>
+          <td class="mono hash">7c5468b370f7c47eda07281e3437fafc568f95d10420051e3aa522709f9342c5</td>
+          <td class="center"><a class="download-btn" href="./data/H" download="H">Download H</a></td>
+        </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="testing">
+      <h2>Testing dataset — I–P</h2>
+      <p class="subtitle">
+        Hidden until the end of the competition and used for the final evaluation.
+        Total uncompressed size: <strong>25,153,011 bytes</strong>.
+      </p>
+      <div class="table-wrap">
+        <table aria-label="Testing dataset downloads">
+          <thead><tr><th>File</th><th class="right">Bytes</th><th>SHA-256</th><th class="center">Download</th></tr></thead>
+          <tbody>
+<tr>
+          <td class="file"><span class="dataset-badge testing">I</span></td>
+          <td class="right num">3,295,751</td>
+          <td class="mono hash">ce0c9f7822cb7cb7736c8e5916733f1334f4abc389c41c5f35d1daca42ac5bd2</td>
+          <td class="center"><a class="download-btn" href="./data/I" download="I">Download I</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge testing">J</span></td>
+          <td class="right num">3,000,000</td>
+          <td class="mono hash">7472a60ee841c2990407baed3b6820ce9bf94d85f00a4538227e075ec3da5d4e</td>
+          <td class="center"><a class="download-btn" href="./data/J" download="J">Download J</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge testing">K</span></td>
+          <td class="right num">3,000,000</td>
+          <td class="mono hash">8073227627c5155d077fda27a7f372a577ece100dd252cf1c0cd814abbf80732</td>
+          <td class="center"><a class="download-btn" href="./data/K" download="K">Download K</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge testing">L</span></td>
+          <td class="right num">3,000,000</td>
+          <td class="mono hash">954ede81041d50edc458dadd9b7074519e1e97d957abf2f81ab2e81ff74d7509</td>
+          <td class="center"><a class="download-btn" href="./data/L" download="L">Download L</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge testing">M</span></td>
+          <td class="right num">3,145,728</td>
+          <td class="mono hash">f0b8d9f3f3b63f795bb40538703ba07454fa597a16c9936b1d0c5b483a2867df</td>
+          <td class="center"><a class="download-btn" href="./data/M" download="M">Download M</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge testing">N</span></td>
+          <td class="right num">4,194,304</td>
+          <td class="mono hash">d787c7ca9ce500187efe980d7eeaa25f0fbca0240256b92871d2d7e999ccfa78</td>
+          <td class="center"><a class="download-btn" href="./data/N" download="N">Download N</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge testing">O</span></td>
+          <td class="right num">2,607,090</td>
+          <td class="mono hash">8a0ae94edb3bf4ee820b371e4f1d8ac8c47320e0442ef774c63a1f5874cd7524</td>
+          <td class="center"><a class="download-btn" href="./data/O" download="O">Download O</a></td>
+        </tr>
+<tr>
+          <td class="file"><span class="dataset-badge testing">P</span></td>
+          <td class="right num">2,910,138</td>
+          <td class="mono hash">da2ca4c742dc55216daeb68b6b7ce6d26fac0aae34f3b657c3322c14df4d0cc8</td>
+          <td class="center"><a class="download-btn" href="./data/P" download="P">Download P</a></td>
+        </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="integrity">
+      <h2>Integrity verification</h2>
+      <p class="subtitle">Validate every downloaded file against the official SHA-256 catalog before reporting results.</p>
+      <div class="command-box">
+        <h3>Linux / macOS</h3>
+        <pre><code>sha256sum -c SHA256SUMS</code></pre>
+
+        <h3 style="margin-top:16px">Download the complete A–P dataset</h3>
+        <pre><code>mkdir -p AITDCC2026
+cd AITDCC2026
+for f in A B C D E F G H I J K L M N O P; do
+  curl -fLO "https://aitdcc.github.io/data/$f"
+done
+curl -fLO "https://aitdcc.github.io/data/SHA256SUMS"
+sha256sum -c SHA256SUMS</code></pre>
+
+        <h3 style="margin-top:16px">Download Testing only (I–P)</h3>
+        <pre><code>for f in I J K L M N O P; do
+  curl -fLO "https://aitdcc.github.io/data/$f"
+done</code></pre>
+      </div>
+    </section>
+
+    <section id="usage">
+      <h2>Reproducibility, commercial validation &amp; attribution</h2>
+      <div class="terms">
+        <p>
+          The publicly released AITDCC 2026 files A–P may be used for independent reproducibility studies,
+          lossless-compression benchmarking, scientific evaluation, and commercial-validation reports.
+          Such use does not imply endorsement of any compressor, product, company, or reported result by the AITDCC organizers.
+        </p>
+        <ul>
+          <li><strong>Mandatory attribution:</strong> any use of one or more AITDCC files must clearly identify the data as originating from the <em>AIT Data Compression Challenge 2026 (AITDCC 2026)</em> and link to the official benchmark page at <a href="https://aitdcc.github.io/">https://aitdcc.github.io/</a>.</li>
+          <li><strong>Paper citation:</strong> publications, technical reports, benchmark reports, commercial-validation reports, presentations, and other public uses of the dataset must also cite the associated AITDCC paper: <em>“The 2026 Algorithmic Information Theory Data Compression Challenge”</em>.</li>
+          <li><strong>Source provenance:</strong> when reporting results for individual files, users should retain and acknowledge the original provenance/source of the corresponding file whenever that provenance is provided by AITDCC or by the underlying source dataset.</li>
+          <li><strong>Reproducibility:</strong> report the exact files evaluated (for example, A–H, I–P, or A–P) and verify them against the SHA-256 values published here.</li>
+          <li><strong>Results:</strong> independently obtained results should be described as independent evaluations, not as official AITDCC competition results.</li>
+          <li><strong>Third-party rights:</strong> where any underlying source material is subject to separate third-party attribution, citation, or licensing terms, those terms continue to apply.</li>
+        </ul>
+        <p class="small">
+          In short, reuse is permitted for reproducibility, research, benchmarking, and commercial validation, provided that the AITDCC origin is credited, the associated AITDCC paper is cited, and any applicable third-party source terms are respected.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      AIT Data Compression Challenge 2026 · Official dataset catalog
+    </footer>
+  </main>
+</div>
+
+<script>
+(() => {
+  const KEY = "dp-theme";
+  const root = document.documentElement;
+  const btn = document.getElementById("dpThemeToggle");
+
+  function apply(theme) {
+    root.classList.toggle("dp-dark", theme === "dark");
+    root.classList.toggle("dp-light", theme === "light");
+    btn.textContent = theme === "dark" ? "🌙 Dark Mode" : "☀ Light Mode";
+    btn.setAttribute("aria-pressed", String(theme === "dark"));
+  }
+
+  const saved = localStorage.getItem(KEY);
+  apply((saved === "light" || saved === "dark") ? saved : "dark");
+
+  btn.addEventListener("click", () => {
+    const next = root.classList.contains("dp-dark") ? "light" : "dark";
+    localStorage.setItem(KEY, next);
+    apply(next);
+  });
+})();
+</script>
+</body>
+</html>
